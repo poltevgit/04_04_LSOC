@@ -1,0 +1,68 @@
+A = rand(5, 1000);
+
+function logzn(amin, amax, x)
+    return amin <= x < amax ? 1 : 0
+end
+
+
+#Создали матрицу 
+B = zeros(Int, 5, 1000)
+
+for i in 1:5
+    for j in 1:1000
+        if i == 1
+            B[i, j] = logzn(0.4, 0.97, A[i, j])  # Строка 1: [0.4, 0.97)
+        elseif i == 2
+            B[i, j] = logzn(0.4, 0.97, A[i, j])  # Строка 2: [0.4, 0.97)
+        elseif i == 3
+            B[i, j] = logzn(0.4, 0.97, A[i, j])  # Строка 3: [0.4, 0.97)
+        elseif i == 4
+            B[i, j] = logzn(0.56, 0.65, A[i, j]) # Строка 4: [0.56, 0.65)
+        elseif i == 5
+            B[i, j] = logzn(0.1, 1.00, A[i, j])  # Строка 5: [0.1, 1.00)
+        end
+    end
+end
+
+#Вычисление частоты
+function fregp(v, m)
+    return sum(v) / m
+end
+
+for i::Int64 in 1:5
+    row_vector = B[i, :]
+    freq = fregp(row_vector)
+    println("Строка $i (событие $i): Частота = $freq")
+end
+
+#Построение графика
+frequencies_over_N = []
+
+for i in 1:5
+    row = B[i, :]
+    q_values = Float64[]
+    running_sum = 0
+    for N in 1:1000
+        running_sum += row[N]
+        current_freq = running_sum / N
+        push!(q_values, current_freq)
+    end
+    push!(frequencies_over_N, q_values)
+end
+
+# Построение графика
+plot(title="Зависимость частоты от числа испытаний (Вариант 18)",
+     xlabel="Число испытаний N",
+     ylabel="Частота события q(N)",
+     legend=:bottomright,
+     linewidth=2)
+
+for i in 1:5
+    plot!(1:1000, frequencies_over_N[i], label="Событие $i (эксперимент)")
+end
+
+hline!([0.57], linestyle=:dash, linecolor=:blue, linewidth=2, label="P1=P2=P3=0.57")
+hline!([0.09], linestyle=:dash, linecolor=:orange, linewidth=2, label="P4=0.09")
+hline!([0.9], linestyle=:dash, linecolor=:purple, linewidth=2, label="P5=0.90")
+plot!()
+
