@@ -1,7 +1,6 @@
 package Main;
 
 import game.SimpleWindow;
-// Импорты должны быть здесь!
 import org.lwjgl.assimp.Assimp;
 import static org.lwjgl.assimp.Assimp.aiGetVersionMajor;
 

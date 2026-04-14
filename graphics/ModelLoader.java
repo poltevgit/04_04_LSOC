@@ -1,21 +1,24 @@
 package graphics;
 
 import org.lwjgl.assimp.*;
+import org.lwjgl.system.MemoryStack;
+
 import java.nio.IntBuffer;
+
 import static org.lwjgl.assimp.Assimp.*;
 
 public class ModelLoader {
     public static Mesh loadModel(String path) {
-        // Импорт файла с флагами: триангуляция, объединение дубликатов, исправление нормалей
-        AIScene scene = aiImportFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals);
+        AIScene scene = aiImportFile(path,
+                aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals);
+
         if (scene == null || scene.mRootNode() == null) {
             throw new RuntimeException("Assimp error: " + aiGetErrorString());
         }
 
-        // Берем первый меш из модели
         AIMesh aiMesh = AIMesh.create(scene.mMeshes().get(0));
 
-        // Извлекаем координаты вершин
+        // Extract vertices
         float[] vertices = new float[aiMesh.mNumVertices() * 3];
         for (int i = 0; i < aiMesh.mNumVertices(); i++) {
             AIVector3D v = aiMesh.mVertices().get(i);
@@ -24,7 +27,7 @@ public class ModelLoader {
             vertices[i * 3 + 2] = v.z();
         }
 
-        // Извлекаем векторы нормалей
+        // Extract normals
         float[] normals = new float[aiMesh.mNumVertices() * 3];
         AIVector3D.Buffer aiNormals = aiMesh.mNormals();
         for (int i = 0; i < aiMesh.mNumVertices(); i++) {
@@ -34,7 +37,7 @@ public class ModelLoader {
             normals[i * 3 + 2] = n.z();
         }
 
-        // Извлекаем индексы граней
+        // Extract indices
         int[] indices = new int[aiMesh.mNumFaces() * 3];
         for (int i = 0; i < aiMesh.mNumFaces(); i++) {
             IntBuffer pIndices = aiMesh.mFaces().get(i).mIndices();
